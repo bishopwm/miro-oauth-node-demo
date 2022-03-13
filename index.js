@@ -77,4 +77,4 @@ app.get('/', (req, res) => {
     res.redirect('https://miro.com/oauth/authorize?response_type=code&client_id=' + process.env.clientID + '&redirect_uri=' + process.env.redirectURL)
 })
 
-app.listen(4000, () => console.log(`Hello World app listening at PORT: 4000`))
+app.listen(3000, () => console.log(`Listenting on Localhost 3000`))
