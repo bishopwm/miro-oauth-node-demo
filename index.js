@@ -19,7 +19,7 @@ const request = require('request');
 // Require 'Body parser' NPM Package parsing the JSON response from API
 const bodyParser = require('body-parser');
 
-// Make request using Express
+// Call Express server
 app.get('/', (req, res) => {
 
     // #1: 
@@ -33,7 +33,7 @@ app.get('/', (req, res) => {
         // ---> Parameters include `grant_type`, `client_id`, `client_secret`, `code`, and `redirect_uri`.
         // ---> See full details in Miro documentation here: https://beta.developers.miro.com/docs/getting-started-with-oauth#step-3
 
-        var url = 'https://api.miro.com/v1/oauth/token?grant_type=authorization_code&client_id=3458764520765619408&client_secret=loGHWJ8v2JymV4CcjhY7K98ksIP9iecU&code=' + req.query.code + '&redirect_uri=' + process.env.redirectURL
+        var url = 'https://api.miro.com/v1/oauth/token?grant_type=authorization_code&client_id=' + process.env.clientID + '&client_secret=' + process.env.clientSecret + '&code=' + req.query.code + '&redirect_uri=' + process.env.redirectURL
     
         request.post(url, (error, response, body) => {
             
