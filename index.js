@@ -1,33 +1,34 @@
 // This sample app is intended to demonstrate the OAuth 2.0 flow that is required to call Miro's V2 APIs. 
-// This Node.js demo can be used as a structural basis for any other preferred language/framework.
-// For the full guide on our OAuth 2.0 flow, please see the documentation here:
+// Devs may consider using this Node.js demo as a structural basis for any other preferred language/framework.
+// NOTE: Any comments with "--->" signify part of a significant step in the flow. Comments without "--->" are added for additional reference on code.
+
+// For the full guide on Miro's OAuth 2.0 flow, please see the documentation here:
 // https://beta.developers.miro.com/docs/getting-started-with-oauth 
 
-// #0: Require dependencies: 
-// ---> 'dotenv', 'Express', 'Request', 'Body-Parser'
+// ---> #0: 
+// ---> Require dependencies: 'dotenv', 'Express', 'Request', 'Body-Parser'
 
 // Require sensitive environment variables (Client ID, Client Secret, Miro Board ID)
 require('dotenv/config');
 
-// Require Express for local server
+// Require Axios for handling HTTP requests to Miro /oauth and Miro API endpoints
+const axios = require('axios');
+
+// Require ExpressJS for local server
 const express = require('express');
 const app = express();
-
-// Require Axios for handling HTTP requests to /oauth and Miro API
-const axios = require('axios');
 
 // Call Express server
 app.get('/', (req, res) => {
 
-    // #1: 
-    // ---> If `code` param is already present in redirect URL, proceed to #3 (Requesting access_token/refresh_token pair, using `code`)
-    // ---> If a `code` has not already been retrieved, proceed to #2 (Redirect to Miro authorization URL)
+    // ---> #1: 
+    // ---> If an authorization `code` has not already been retrieved from the redirect URL after Miro authorization screen, proceed to #2 (Redirect to Miro authorization URL). Else, proceed to #3 (Requesting access_token/refresh_token pair, using `code`).
 
     if (req.query.code) {
 
         // #3: 
-        // ---> Request access_token and refresh_token pair by making a request to Miro /oauth endpoint. 
-        // ---> Parameters include `grant_type`, `client_id`, `client_secret`, `code`, and `redirect_uri`.
+        // ---> Request `access_token` and `refresh_token` pair by making a request to Miro /oauth endpoint. 
+        // ---> Required parameters include `grant_type`, `client_id`, `client_secret`, `code`, and `redirect_uri`.
         // ---> See full details in Miro documentation here: https://beta.developers.miro.com/docs/getting-started-with-oauth#step-3
 
         var url = 'https://api.miro.com/v1/oauth/token?grant_type=authorization_code&client_id=' + process.env.clientID + '&client_secret=' + process.env.clientSecret + '&code=' + req.query.code + '&redirect_uri=' + process.env.redirectURL
@@ -36,42 +37,39 @@ app.get('/', (req, res) => {
             console.log(`access_token: ${response.data.access_token}`)
             console.log(`refresh_token: ${response.data.refresh_token}`)
 
+            // Set global variable for access_token value
             const access_token = response.data.access_token;
 
-            var requestUrl = 'https://api.miro.com/v2/boards/' + process.env.boardId
-            
+            // Specify Miro API request URL
+            var requestUrl = `https://api.miro.com/v2/boards/${process.env.boardId}`
             
             // #4:
-            // Send an API request to any Miro endpoint that contains the same permissions as your OAuth 2.0 app in https://miro.com/app/settings/user-profile/apps
+            // ---> If `access_token` was successfully retrieved, send an API request to any Miro endpoint that contains the same permissions as your OAuth 2.0 app, with `access_token` as value for Bearer Token. 
+            // ---> (See permissions under user profile > apps: https://miro.com/app/settings/user-profile/apps)
 
             if (access_token) {
-                console.log("alles goed!")
-                
+                // API request options
                 var config = {
                     method: 'get',
                     url: requestUrl,
                     headers: { 
-                      'Authorization': 'Bearer ' + access_token
+                      'Authorization': `Bearer ${access_token}`
                     }
                   }
                   axios(config)
                   .then(function (response) {
                     console.log(JSON.stringify(response.data))
-                    var stuff = JSON.stringify(response.data)
+                    
+                    // Create local variable for API response
+                    var miroResponse = JSON.stringify(response.data)
 
                     // Display response in browser
-                        var JSONResponse = '<pre><code>' + stuff + '</code></pre>'
+                        var JSONResponse = `<pre><code>${miroResponse}</code></pre>`
                         res.send(`
                             <div class="container">
-                                <div class="info">
-                                    <div>
-                                        <h1>Hello, World!</h1>
-                                    </div>
-                                </div>
-                                <div class="response">
-                                    <h2>API Response:</h2>
-                                    ${JSONResponse}
-                                </div>
+                                <h1>Hello, World!</h1>
+                                <h3>Miro API Response:</h3>
+                                ${JSONResponse}
                             </div>
                         `)
                   })
@@ -82,11 +80,11 @@ app.get('/', (req, res) => {
           }).catch(function(error) {
             console.log(error)
         })
-          return
+        return
     }
 
-    // #2: 
-    // If no authorization code is present, redirect to Miro OAuth to authorize retrieve new `code`.
+    // ---> #2: 
+    // ---> If no authorization code is present, redirect to Miro OAuth to authorize retrieve new `code`.
     res.redirect('https://miro.com/oauth/authorize?response_type=code&client_id=' + process.env.clientID + '&redirect_uri=' + process.env.redirectURL)
 })
 
