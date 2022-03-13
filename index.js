@@ -13,11 +13,8 @@ require('dotenv/config');
 const express = require('express');
 const app = express();
 
-// Require 'Request' NPM Package for handling HTTP requests to Miro /oauth and API endpoint
-const request = require('request');
-
-// Require 'Body parser' NPM Package parsing the JSON response from API
-const bodyParser = require('body-parser');
+// Require Axios for handling HTTP requests to /oauth and Miro API
+const axios = require('axios');
 
 // Call Express server
 app.get('/', (req, res) => {
@@ -35,28 +32,35 @@ app.get('/', (req, res) => {
 
         var url = 'https://api.miro.com/v1/oauth/token?grant_type=authorization_code&client_id=' + process.env.clientID + '&client_secret=' + process.env.clientSecret + '&code=' + req.query.code + '&redirect_uri=' + process.env.redirectURL
     
-        request.post(url, (error, response, body) => {
+        axios.post(url, {}).then(function(response) {
+            console.log(`access_token: ${response.data.access_token}`)
+            console.log(`refresh_token: ${response.data.refresh_token}`)
+
+            const access_token = response.data.access_token;
+
+            var requestUrl = 'https://api.miro.com/v2/boards/' + process.env.boardId
             
-            body = JSON.parse(body);
-        
-            // ---> For reference: console log access_token and refresh_token on express server
-            console.log(`access_token: ${body.access_token}`);
-            console.log(`refresh_token: ${body.refresh_token}`);
+            
+            // #4:
+            // Send an API request to any Miro endpoint that contains the same permissions as your OAuth 2.0 app in https://miro.com/app/settings/user-profile/apps
 
-            if (body.access_token) {
+            if (access_token) {
+                console.log("alles goed!")
+                
+                var config = {
+                    method: 'get',
+                    url: requestUrl,
+                    headers: { 
+                      'Authorization': 'Bearer ' + access_token
+                    }
+                  }
+                  axios(config)
+                  .then(function (response) {
+                    console.log(JSON.stringify(response.data))
+                    var stuff = JSON.stringify(response.data)
 
-                // #4:
-                // Send an API request to any Miro endpoint that contains the same permissions as your OAuth 2.0 app in https://miro.com/app/settings/user-profile/apps
-
-                request.get('https://api.miro.com/v2/boards/uXjVOHbG8r4=', (error, response, body) => {
-                    if (error) {
-                        console.log('Error: ', error)
-                    } else {
-                        body = JSON.parse(body);
-                        // Display response in console
-                        console.log('API call ', body);
-                        // Display response in browser
-                        var JSONResponse = '<pre><code>' + JSON.stringify(body, null, 2) + '</code></pre>'
+                    // Display response in browser
+                        var JSONResponse = '<pre><code>' + stuff + '</code></pre>'
                         res.send(`
                             <div class="container">
                                 <div class="info">
@@ -69,18 +73,16 @@ app.get('/', (req, res) => {
                                     ${JSONResponse}
                                 </div>
                             </div>
-                        `);
-                    }
-                }).auth(null, null, true, body.access_token);
-
-            } else {
-                console.log("Error, need to do some digging.")
-            }
-
-        }).auth(process.env.clientID, process.env.clientSecret);
-
-        return;
-
+                        `)
+                  })
+                  .catch(function (error) {
+                    console.log(error)
+                  })
+                }  
+          }).catch(function(error) {
+            console.log(error)
+        })
+          return
     }
 
     // #2: 
