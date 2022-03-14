@@ -6,7 +6,7 @@
 // https://beta.developers.miro.com/docs/getting-started-with-oauth 
 
 // ---> #0: 
-// ---> Require dependencies: 'dotenv', 'Express', 'Request', 'Body-Parser'
+// ---> Require dependencies: 'dotenv', 'axios', 'express'
 
 // Require sensitive environment variables (Client ID, Client Secret, Miro Board ID)
 require('dotenv/config');
