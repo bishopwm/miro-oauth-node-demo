@@ -5,8 +5,6 @@
 // For the full guide on Miro's OAuth 2.0 flow, please see the documentation here:
 // https://beta.developers.miro.com/docs/getting-started-with-oauth 
 
-// ---> #0: 
-// ---> Require dependencies: 'dotenv', 'axios', 'express'
 
 // Require sensitive environment variables (Client ID, Client Secret, Miro Board ID)
 require('dotenv/config');
@@ -31,7 +29,7 @@ app.get('/', (req, res) => {
         // ---> Required parameters include `grant_type`, `client_id`, `client_secret`, `code`, and `redirect_uri`.
         // ---> See full details in Miro documentation here: https://beta.developers.miro.com/docs/getting-started-with-oauth#step-3
 
-        var url = 'https://api.miro.com/v1/oauth/token?grant_type=authorization_code&client_id=' + process.env.clientID + '&client_secret=' + process.env.clientSecret + '&code=' + req.query.code + '&redirect_uri=' + process.env.redirectURL
+        let url = 'https://api.miro.com/v1/oauth/token?grant_type=authorization_code&client_id=' + process.env.clientID + '&client_secret=' + process.env.clientSecret + '&code=' + req.query.code + '&redirect_uri=' + process.env.redirectURL
     
         axios.post(url, {}).then(function(response) {
             console.log(`access_token: ${response.data.access_token}`)
@@ -41,7 +39,7 @@ app.get('/', (req, res) => {
             const access_token = response.data.access_token;
 
             // Specify Miro API request URL
-            var requestUrl = `https://api.miro.com/v2/boards/${process.env.boardId}`
+            let requestUrl = `https://api.miro.com/v2/boards/${process.env.boardId}`
             
             // #4:
             // ---> If `access_token` was successfully retrieved, send an API request to any Miro endpoint that contains the same permissions as your OAuth 2.0 app, with `access_token` as value for Bearer Token. 
@@ -61,7 +59,7 @@ app.get('/', (req, res) => {
                     console.log(JSON.stringify(response.data))
                     
                     // Create local variable for API response
-                    var miroResponse = JSON.stringify(response.data)
+                    let miroResponse = JSON.stringify(response.data)
 
                     // Display response in browser
                         var JSONResponse = `<pre><code>${miroResponse}</code></pre>`
