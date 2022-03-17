@@ -48,7 +48,7 @@ app.get('/', (req, res) => {
             // ---> (See permissions under user profile > apps: https://miro.com/app/settings/user-profile/apps)
             if (access_token) {
                 // API request options
-                var config = {
+                let config = {
                     method: 'get',
                     url: requestUrl,
                     headers: { 
@@ -61,7 +61,7 @@ app.get('/', (req, res) => {
                         console.log(JSON.stringify(response.data));
                         let miroResponse = JSON.stringify(response.data);
                         // Display response in browser
-                            var JSONResponse = `<pre><code>${miroResponse}</code></pre>`
+                            let JSONResponse = `<pre><code>${miroResponse}</code></pre>`
                             res.send(`
                                 <div class="container">
                                     <h1>Hello, World!</h1>
