@@ -22,11 +22,11 @@ In this example, we will host our local environment over `HTTPS` using [Localtun
 (You can use other services such as [ngrok](https://ngrok.com/download) as well.)
 
 - Install [localtunnel](https://www.npmjs.com/package/localtunnel) (or your preferred service)
-- Generate your HTTPS url (if using localtunnel, `lt --port 3000`) for localhost
+- Generate your HTTPS URL (if using localtunnel, `lt --port 3000`) for localhost
 - Copy this HTTPS URL and paste it in the `Redirect URI for OAuth2.0` box in your Miro app settings
-- Paste this same HTTPS URL into your `.env` variable (above)
-- From your desired Miro board, grab the board ID from the URL and paste it into your `.env` variable (above)
-- From your Miro app settings, grab the Client ID and Client Secret. Paste this into your `.env` variables (above)
+- Paste this same HTTPS URL into your `.env` `redirectURL` variable (above)
+- From your desired Miro board, grab the board ID from the URL and paste it into your `.env` `boardId` variable (above)
+- From your Miro app settings, grab the Client ID and Client Secret. Paste this into your `.env` `clientId` and `clientSecret` variables (above)
 
 ## How to run the project
 - Run `npm run start` to run the project
